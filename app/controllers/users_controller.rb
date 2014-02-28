@@ -96,9 +96,11 @@ class UsersController < ApplicationController
 
   def login
     if User.where(:username => user_params[:username], :password => user_params[:password]).exists?
-      render :text => "true"
+      render :nothing => true, :status => 200
+
     else
-      render :text => "false"
+      render :nothing => true, :status => 404
+
     end
   end
 
