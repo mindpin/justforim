@@ -99,7 +99,7 @@ class UsersController < ApplicationController
       render :nothing => true, :status => 200
 
     else
-      render :nothing => true, :status => 411
+      render :nothing => true, :status => 401
 
     end
   end

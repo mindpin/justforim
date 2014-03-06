@@ -2,11 +2,12 @@ class MessagesController < ApplicationController
 
   def index
     username = params['user'] + '@localhost'
-    @messages = Message.history(username).map do |message| 
-      Message.hash_in_android(message)
+    @messages = OfMessageArchive.history(username).map do |message| 
+      OfMessageArchive.hash_in_android(message)
     end
 
     @messages = Kaminari.paginate_array(@messages).page(params[:page])
+    OfMessageArchive.where("fromJID = ? or toJID = ?", params[:orders], false).page(params[:page]
 
 
     respond_to do |format|
