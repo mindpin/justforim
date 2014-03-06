@@ -1,5 +1,7 @@
 class OfMessageArchive < ActiveRecord::Base
   establish_connection("openfire_development")
+  self.table_name = "ofMessageArchive"
+
 
   # def self.history(username)
     

@@ -30,6 +30,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;  
 import org.w3c.dom.Node;  
 import org.w3c.dom.NodeList;  
+import org.xmpp.packet.JID;
 
 
 public class MyAuthProvider implements AuthProvider {
@@ -62,7 +63,8 @@ public class MyAuthProvider implements AuthProvider {
 			InternalUnauthenticatedException {
 		// TODO Auto-generated method stub
 		
-		System.out.println("----hello world username -----: " + username);
+		String http_username = JID.unescapeNode(username);
+		System.out.println("----hello world username -----: " + http_username);
 		
 		String url = "";
 		String username_param = "";
@@ -119,7 +121,7 @@ public class MyAuthProvider implements AuthProvider {
             
 
             //Add any parameter if u want to send it with Post req.
-            method.addParameter(username_param, username);
+            method.addParameter(username_param, http_username);
             method.addParameter(password_param, password);
 
             int statusCode = client.executeMethod(method);
@@ -127,7 +129,7 @@ public class MyAuthProvider implements AuthProvider {
             System.out.println("status code: " + statusCode);
             
             
-            if (statusCode == 401) {
+            if (statusCode != 200) {
                 // in = method.getResponseBodyAsStream();
             	throw new UnauthorizedException();
             }

@@ -19,7 +19,7 @@
         <td><%= user.username %></td>
         <td><%= user.password %></td>
         <td><img src="http://localhost:9090/plugins/presence/status?jid=<%= user.username %>@localhost" border="0"></td>
-        <td><a href="/messages?user=<%= user.username %>">聊天记录</a></td>
+        <td><a href="/messages?user=<%= user.username %>&page=1">聊天记录</a></td>
         <td><%= link_to 'Show', user %></td>
         <td><%= link_to 'Destroy', user, method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>
