@@ -1,0 +1,25 @@
+
+
+<h1>Listing messages</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th width="200px">from</th>
+      <th width="200px">to</th>
+      <th width="400px">body</th>
+      <th width="200px">date</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @messages.each do |message| %>
+      <tr height="30px">
+        <td><%= message['fromJID'] %></td>
+        <td><%= message['toJID'] %></td>
+        <td><%= message['body'] %></td>
+        <td><%= Time.at(message['sentDate']/1000.0).strftime("%Y-%m-%d %H:%M.%S") %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

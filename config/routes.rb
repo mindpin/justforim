@@ -6,4 +6,6 @@ Justforim::Application.routes.draw do
       post :enable
     end
   end
+
+  resources :messages
 end
