@@ -127,7 +127,7 @@ public class MyAuthProvider implements AuthProvider {
             System.out.println("status code: " + statusCode);
             
             
-            if (statusCode == 411) {
+            if (statusCode == 401) {
                 // in = method.getResponseBodyAsStream();
             	throw new UnauthorizedException();
             }
