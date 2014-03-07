@@ -1,8 +1,9 @@
 <?xml version="1.0"?>
 <web>
- <server id="http://localhost:3000/users/login">
-   <username>user[username]</username>
+ <server id="http://4ye-evaluation.mindpin.com/account/sign_in">
+   <username>user[email]</username>
    <password>user[password]</password>
+   <group>default_group</group>
  </server>
 </web>
 

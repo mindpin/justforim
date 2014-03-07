@@ -10,9 +10,16 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.PostMethod;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.jivesoftware.openfire.XMPPServer;
 import org.jivesoftware.openfire.group.GroupAlreadyExistsException;
 import org.jivesoftware.openfire.group.GroupNotFoundException;
@@ -20,10 +27,14 @@ import org.jivesoftware.openfire.plugin.UserServicePlugin;
 import org.jivesoftware.openfire.user.UserAlreadyExistsException;
 import org.jivesoftware.openfire.user.UserManager;
 import org.jivesoftware.openfire.user.UserNotFoundException;
+import org.json.JSONObject;
+import org.json.simple.JSONValue;
 
 
 
 import java.io.File;  
+import java.util.ArrayList;
+
 import javax.xml.parsers.DocumentBuilder;  
 import javax.xml.parsers.DocumentBuilderFactory;  
 import org.w3c.dom.Document;  
@@ -62,9 +73,12 @@ public class MyAuthProvider implements AuthProvider {
 			throws UnauthorizedException, ConnectionException,
 			InternalUnauthenticatedException {
 		// TODO Auto-generated method stub
+		username = username.trim().toLowerCase();
 		
-		String http_username = JID.unescapeNode(username);
-		System.out.println("----hello world username -----: " + http_username);
+		String web_user_id = "";
+		String web_email = JID.unescapeNode(username);
+
+		System.out.println("----hello world username -----: " + web_email);
 		
 		String url = "";
 		String username_param = "";
@@ -110,30 +124,52 @@ public class MyAuthProvider implements AuthProvider {
 	    }
 			 
 		
-        username = username.trim().toLowerCase();
+        
         
  
-        InputStream in = null;
-
         try {
-            HttpClient client = new HttpClient();
-            PostMethod method = new PostMethod(url);
+        	String response = new String();
+        	
+        	HttpClient httpclient;
+            HttpPost httppost;
+            ArrayList<NameValuePair> postParameters;
+            httpclient = new DefaultHttpClient();
+            httppost = new HttpPost(url);
+
+
+            postParameters = new ArrayList<NameValuePair>();
+            postParameters.add(new BasicNameValuePair(username_param, web_email));
+            postParameters.add(new BasicNameValuePair(password_param, password));
+
+            httppost.setEntity(new UrlEncodedFormEntity(postParameters));
+
+            HttpResponse httpresponse = httpclient.execute(httppost);
             
+            HttpEntity responseEntity = httpresponse.getEntity();
+            if(responseEntity!=null) {
+                response = EntityUtils.toString(responseEntity);
+            }
+            
+            int statusCode = httpresponse.getStatusLine().getStatusCode();
 
-            //Add any parameter if u want to send it with Post req.
-            method.addParameter(username_param, http_username);
-            method.addParameter(password_param, password);
-
-            int statusCode = client.executeMethod(method);
+            JSONObject json = new JSONObject(response);
+            System.out.println("json is: " + json);
+            web_user_id = Integer.toString((Integer) json.get("id"));
+            web_email = json.getString("email");
+            
             
             System.out.println("status code: " + statusCode);
+            System.out.println("response content: " + response);
+            System.out.println("user_id as username: " + web_user_id);
+            System.out.println("email: " + web_email);
             
             
             if (statusCode != 200) {
                 // in = method.getResponseBodyAsStream();
             	throw new UnauthorizedException();
             }
-
+            
+            username = web_user_id;
 
         } catch (Exception e) {
         	throw new UnauthorizedException();
@@ -142,7 +178,7 @@ public class MyAuthProvider implements AuthProvider {
         XMPPServer server = XMPPServer.getInstance();
         UserManager userManager = server.getUserManager();
         try {
-			userManager.createUser(username, password, "", "");
+			userManager.createUser(username, password, "", web_email);
 			userManager.getUser(username);
 		} catch (UserAlreadyExistsException e) {
 			// TODO Auto-generated catch block
@@ -154,6 +190,7 @@ public class MyAuthProvider implements AuthProvider {
 			// e.printStackTrace();
 		}
         
+        System.out.println("last username: " + username);
 	    
 	}
 

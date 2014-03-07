@@ -94,9 +94,12 @@ class UsersController < ApplicationController
   end
 
 
+
   def login
-    if User.where(:username => user_params[:username], :password => user_params[:password]).exists?
-      render :nothing => true, :status => 200
+    if User.where(:email => user_params[:email], :password => user_params[:password]).exists?
+    # if User.where(:username => user_params[:username], :password => user_params[:password]).exists?
+      id = User.where(:email => user_params[:email], :password => user_params[:password]).first.id
+      render :json => {:id => id}, :status => 200
 
     else
       render :nothing => true, :status => 401
