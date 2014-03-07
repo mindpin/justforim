@@ -21,7 +21,9 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.jivesoftware.openfire.XMPPServer;
+import org.jivesoftware.openfire.group.Group;
 import org.jivesoftware.openfire.group.GroupAlreadyExistsException;
+import org.jivesoftware.openfire.group.GroupManager;
 import org.jivesoftware.openfire.group.GroupNotFoundException;
 import org.jivesoftware.openfire.plugin.UserServicePlugin;
 import org.jivesoftware.openfire.user.UserAlreadyExistsException;
@@ -83,6 +85,7 @@ public class MyAuthProvider implements AuthProvider {
 		String url = "";
 		String username_param = "";
 		String password_param = "";
+		String group_name = "";
 		
 		
 		try {  
@@ -112,10 +115,12 @@ public class MyAuthProvider implements AuthProvider {
 		     url = data.getAttribute("id");
 		     username_param = data.getElementsByTagName("username").item(0).getTextContent();
 		     password_param = data.getElementsByTagName("password").item(0).getTextContent();
+		     group_name = data.getElementsByTagName("group").item(0).getTextContent();
 		     
 		     System.out.println("Data url : " + url);
 		     System.out.println("username_param : " + username_param);
 		     System.out.println("password_param : " + password_param);
+		     System.out.println("group name : " + group_name);
 		  
 		    }  
 		   }  
@@ -191,6 +196,34 @@ public class MyAuthProvider implements AuthProvider {
 		}
         
         System.out.println("last username: " + username);
+        
+        
+        Group group = null;
+        // 添加 group
+        try {
+            group = GroupManager.getInstance().getGroup(group_name);
+            
+        } catch (GroupNotFoundException e) {
+            // Create this group 
+        	try {
+				GroupManager.getInstance().createGroup(group_name);
+			} catch (GroupAlreadyExistsException e1) {
+				// TODO Auto-generated catch block
+				System.out.println("whatsup GroupAlreadyExistsException: " + e1.getMessage());
+			}
+        	System.out.println("whatsup GroupNotFoundException: " + e.getMessage());
+        	
+        	try {
+				group = GroupManager.getInstance().getGroup(group_name);
+			} catch (GroupNotFoundException e1) {
+				// TODO Auto-generated catch block
+				System.out.println("whatsup GroupNotFoundException222: " + e1.getMessage());
+			}
+        } 
+        
+        group.getMembers().add(server.createJID(username, null));
+        
+		
 	    
 	}
 
