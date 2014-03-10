@@ -71,66 +71,16 @@ public class MyAuthProvider implements AuthProvider {
 	}
 
 	@Override
-	public void authenticate(String username, String password)
+	public void authenticate(String input_username, String password)
 			throws UnauthorizedException, ConnectionException,
 			InternalUnauthenticatedException {
-		// TODO Auto-generated method stub
-		username = username.trim().toLowerCase();
 		
-		String web_user_id = "";
-		String web_email = JID.unescapeNode(username);
-
-		System.out.println("----hello world username -----: " + web_email);
+		// String web_email = "";
+		String username = JID.unescapeNode(input_username);
+		ConfigInfo ci = get_config_info();
 		
-		String url = "";
-		String username_param = "";
-		String password_param = "";
-		String group_name = "";
-		
-		
-		try {  
-			  
-		   File xmlFile = new File("../conf/web-server-url.xml");  
-		   DocumentBuilderFactory documentFactory = DocumentBuilderFactory  
-		     .newInstance();  
-		   DocumentBuilder documentBuilder = documentFactory  
-		     .newDocumentBuilder();  
-		   Document doc = documentBuilder.parse(xmlFile);  
-		  
-		   doc.getDocumentElement().normalize();  
-		   NodeList nodeList = doc.getElementsByTagName("server");  
-		  
-		   System.out.println("Root element :"  
-		     + doc.getDocumentElement().getNodeName());  
-		  
-		   for (int temp = 0; temp < nodeList.getLength(); temp++) {  
-		    Node node = nodeList.item(temp);  
-		  
-		    System.out.println("\nElement type :" + node.getNodeName());  
-		  
-		    if (node.getNodeType() == Node.ELEMENT_NODE) {  
-		  
-		     Element data = (Element) node;  
-		     
-		     url = data.getAttribute("id");
-		     username_param = data.getElementsByTagName("username").item(0).getTextContent();
-		     password_param = data.getElementsByTagName("password").item(0).getTextContent();
-		     group_name = data.getElementsByTagName("group").item(0).getTextContent();
-		     
-		     System.out.println("Data url : " + url);
-		     System.out.println("username_param : " + username_param);
-		     System.out.println("password_param : " + password_param);
-		     System.out.println("group name : " + group_name);
-		  
-		    }  
-		   }  
-	    } catch (Exception e) {  
-		   e.printStackTrace();  
-	    }
-			 
-		
-        
-        
+		System.out.println("current username: " + input_username);
+		System.out.println("unescapeNode username: " + username);
  
         try {
         	String response = new String();
@@ -139,12 +89,12 @@ public class MyAuthProvider implements AuthProvider {
             HttpPost httppost;
             ArrayList<NameValuePair> postParameters;
             httpclient = new DefaultHttpClient();
-            httppost = new HttpPost(url);
+            httppost = new HttpPost(ci.auth_url);
 
 
             postParameters = new ArrayList<NameValuePair>();
-            postParameters.add(new BasicNameValuePair(username_param, web_email));
-            postParameters.add(new BasicNameValuePair(password_param, password));
+            postParameters.add(new BasicNameValuePair(ci.login_param, username));
+            postParameters.add(new BasicNameValuePair(ci.password_param, password));
 
             httppost.setEntity(new UrlEncodedFormEntity(postParameters));
 
@@ -159,14 +109,12 @@ public class MyAuthProvider implements AuthProvider {
 
             JSONObject json = new JSONObject(response);
             System.out.println("json is: " + json);
-            web_user_id = Integer.toString((Integer) json.get("id"));
-            web_email = json.getString("email");
+            // web_email = json.getString("email");
             
             
             System.out.println("status code: " + statusCode);
             System.out.println("response content: " + response);
-            System.out.println("user_id as username: " + web_user_id);
-            System.out.println("email: " + web_email);
+            // System.out.println("web email: " + web_email);
             
             
             if (statusCode != 200) {
@@ -174,8 +122,6 @@ public class MyAuthProvider implements AuthProvider {
             	throw new UnauthorizedException();
             }
             
-            username = web_user_id;
-
         } catch (Exception e) {
         	throw new UnauthorizedException();
         }
@@ -183,47 +129,20 @@ public class MyAuthProvider implements AuthProvider {
         XMPPServer server = XMPPServer.getInstance();
         UserManager userManager = server.getUserManager();
         try {
-			userManager.createUser(username, password, "", web_email);
-			userManager.getUser(username);
+			userManager.createUser(input_username, password, "", "");
+			userManager.getUser(input_username);
 		} catch (UserAlreadyExistsException e) {
-			// TODO Auto-generated catch block
 			System.out.println("whatsup: " + e.getMessage());
-			// e.printStackTrace();
 		} catch (UserNotFoundException e) {
-			// TODO Auto-generated catch block
 			System.out.println("whatsup: " + e.getMessage());
-			// e.printStackTrace();
+		} catch (Exception e) {
+			System.out.println("whatsup: " + e.getMessage());
 		}
         
+        
+        _add_user_group(input_username);
+        
         System.out.println("last username: " + username);
-        
-        
-        Group group = null;
-        // 添加 group
-        try {
-            group = GroupManager.getInstance().getGroup(group_name);
-            
-        } catch (GroupNotFoundException e) {
-            // Create this group 
-        	try {
-				GroupManager.getInstance().createGroup(group_name);
-			} catch (GroupAlreadyExistsException e1) {
-				// TODO Auto-generated catch block
-				System.out.println("whatsup GroupAlreadyExistsException: " + e1.getMessage());
-			}
-        	System.out.println("whatsup GroupNotFoundException: " + e.getMessage());
-        	
-        	try {
-				group = GroupManager.getInstance().getGroup(group_name);
-			} catch (GroupNotFoundException e1) {
-				// TODO Auto-generated catch block
-				System.out.println("whatsup GroupNotFoundException222: " + e1.getMessage());
-			}
-        } 
-        
-        group.getMembers().add(server.createJID(username, null));
-        
-		
 	    
 	}
 
@@ -254,6 +173,87 @@ public class MyAuthProvider implements AuthProvider {
 	public boolean supportsPasswordRetrieval() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+	
+	
+	private void _add_user_group(String username) {
+		Group group = null;
+		String group_name = "default_group";
+		XMPPServer server = XMPPServer.getInstance();
+		
+        try {
+            group = GroupManager.getInstance().getGroup(group_name);
+            
+        } catch (GroupNotFoundException e) {
+            // Create this group 
+        	try {
+				GroupManager.getInstance().createGroup(group_name);
+			} catch (GroupAlreadyExistsException e1) {
+				// TODO Auto-generated catch block
+				System.out.println("whatsup GroupAlreadyExistsException: " + e1.getMessage());
+			}
+        	System.out.println("whatsup GroupNotFoundException: " + e.getMessage());
+        	
+        	try {
+				group = GroupManager.getInstance().getGroup(group_name);
+			} catch (GroupNotFoundException e1) {
+				// TODO Auto-generated catch block
+				System.out.println("whatsup GroupNotFoundException222: " + e1.getMessage());
+			}
+        } 
+        
+        group.getMembers().add(server.createJID(username, null));
+	}
+	
+	
+	private ConfigInfo get_config_info() {
+		ConfigInfo ci = new ConfigInfo();
+		try {  
+			  
+			   File xmlFile = new File("../conf/web-auth-server-conf.xml");  
+			   DocumentBuilderFactory documentFactory = DocumentBuilderFactory  
+			     .newInstance();  
+			   DocumentBuilder documentBuilder = documentFactory  
+			     .newDocumentBuilder();  
+			   Document doc = documentBuilder.parse(xmlFile);  
+			  
+			   doc.getDocumentElement().normalize();  
+			   NodeList nodeList = doc.getElementsByTagName("config");  
+			  
+			   System.out.println("Root element :"  
+			     + doc.getDocumentElement().getNodeName());  
+			  
+			   for (int temp = 0; temp < nodeList.getLength(); temp++) {
+			    Node node = nodeList.item(temp);  
+			  
+			    System.out.println("\nElement type :" + node.getNodeName());  
+			  
+			    if (node.getNodeType() == Node.ELEMENT_NODE) {  
+			  
+			     Element data = (Element) node;  
+			     
+			     ci.login_param = data.getElementsByTagName("login_param").item(0).getTextContent();
+			     ci.password_param = data.getElementsByTagName("password_param").item(0).getTextContent();
+			     ci.auth_url = data.getElementsByTagName("auth_url").item(0).getTextContent();
+			     
+			     System.out.println("Data url : " + ci.auth_url);
+			     System.out.println("username_param : " + ci.login_param);
+			     System.out.println("password_param : " + ci.password_param);
+			  
+			    }  
+			   }  
+		    } catch (Exception e) {  
+			   e.printStackTrace();  
+		    }
+		
+		
+		return ci;
+	}
+	
+	class ConfigInfo {
+		String auth_url;
+		String login_param;
+		String password_param;
 	}
 
     

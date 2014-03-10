@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<config>
+   <auth_url>http://4ye-evaluation.mindpin.com/account/sign_in</auth_url>
+   <login_param>user[login]</login_param>
+   <password_param>user[password]</password_param>
+</config>
+
