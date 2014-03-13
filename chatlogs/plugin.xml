@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plugin>
+    <class>org.jivesoftware.openfire.plugin.ChatLogsPlugin</class>
+    <name>Chat Logs</name>
+    <description>Allows users to retrieve the chat logs</description>
+    <author>Arly Xiao</author>
+    <version>1.0.0</version>
+    <date>03/13/2014</date>
+    <minServerVersion>3.9.0</minServerVersion>
+    
+    <adminconsole>      
+        <tab id="tab-server">
+            <sidebar id="sidebar-server-settings">
+                <item id="chat-logs" name="Chat Logs" url="chat-logs.jsp"
+                     description="Chat Logs" />
+            </sidebar>
+        </tab>
+    </adminconsole>
+
+</plugin>
