@@ -34,9 +34,20 @@ public class ChatLogsServlet extends HttpServlet {
         Connection con = null;
         PreparedStatement result = null;
         JSONObject obj = null;
+        JSONArray json = new JSONArray();
+        
+        int pageSize = 5;
+        int page = Integer.parseInt(request.getParameter("page"));
+        int startIndex = (page - 1) * pageSize;
+        int numResults = pageSize;
         
         StringBuilder query = new StringBuilder();
-        query.append("SELECT * from ofMessageArchive");
+        query.append("SELECT * from ofMessageArchive ");
+        query.append(" ORDER BY  ofMessageArchive.sentDate");
+        query.append(" DESC");
+        query.append(" LIMIT ").append(startIndex).append(",").append(numResults);
+        
+        System.out.println("sql is : " + query.toString());
         
         
         try {
@@ -67,12 +78,14 @@ public class ChatLogsServlet extends HttpServlet {
             	        break;
             	    }
             	  }
+            	  json.add(obj);
             }
+            
             rs.close();
             
-            System.out.println("final obj -- " + obj);
+            System.out.println("final json -- " + json);
             
-            replyMessage(obj, response, out);
+            replyMessage(json, response, out);
             
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -84,7 +97,7 @@ public class ChatLogsServlet extends HttpServlet {
         }
     }
     
-    private void replyMessage(JSONObject json, HttpServletResponse response, PrintWriter out){
+    private void replyMessage(JSONArray json, HttpServletResponse response, PrintWriter out){
         response.setContentType("text/json; charset=utf-8");        
         out.println(json);
         out.flush();
@@ -101,11 +114,7 @@ public class ChatLogsServlet extends HttpServlet {
             HttpServletResponse response) throws ServletException, IOException {  
         super.doPost(request, response);  
   
-        response.setContentType("text/plain");  
-        PrintWriter out = response.getWriter();  
-        System.out.println("请求HelloWorldServlet doPost Method");  
-        out.print("请求HelloWorldServlet doPost Method");  
-        out.flush();  
+        // response.setContentType("text/plain");
     }  
   
     @Override  
