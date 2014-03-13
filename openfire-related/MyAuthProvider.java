@@ -1,14 +1,9 @@
 package org.jivesoftware.openfire.auth;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 
 import org.apache.http.HttpEntity;
@@ -25,20 +20,15 @@ import org.jivesoftware.openfire.group.Group;
 import org.jivesoftware.openfire.group.GroupAlreadyExistsException;
 import org.jivesoftware.openfire.group.GroupManager;
 import org.jivesoftware.openfire.group.GroupNotFoundException;
-import org.jivesoftware.openfire.plugin.UserServicePlugin;
 import org.jivesoftware.openfire.user.UserAlreadyExistsException;
 import org.jivesoftware.openfire.user.UserManager;
 import org.jivesoftware.openfire.user.UserNotFoundException;
 import org.json.JSONObject;
-import org.json.simple.JSONValue;
 
 
 
-import java.io.File;  
 import java.util.ArrayList;
 
-import javax.xml.parsers.DocumentBuilder;  
-import javax.xml.parsers.DocumentBuilderFactory;  
 import org.w3c.dom.Document;  
 import org.w3c.dom.Element;  
 import org.w3c.dom.Node;  
