@@ -14,13 +14,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;  
 
 import org.jivesoftware.database.DbConnectionManager;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
   
 public class ChatLogsServlet extends HttpServlet {  
   
-    @Override  
+
+	private static final long serialVersionUID = 1L;
+
+	@Override  
     public void init() throws ServletException {  
         super.init();  
     }  
@@ -29,25 +33,33 @@ public class ChatLogsServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request,  
             HttpServletResponse response) throws ServletException, IOException {  
         // super.doGet(request, response);
-  
+    	  
         PrintWriter out = response.getWriter();
         Connection con = null;
         PreparedStatement result = null;
         JSONObject obj = null;
         JSONArray json = new JSONArray();
         
+        String username = request.getParameter("username");
         int pageSize = 5;
         int page = Integer.parseInt(request.getParameter("page"));
         int startIndex = (page - 1) * pageSize;
         int numResults = pageSize;
         
+        System.out.println("username is: " + username);
+        
+        
         StringBuilder query = new StringBuilder();
-        query.append("SELECT * from ofMessageArchive ");
-        query.append(" ORDER BY  ofMessageArchive.sentDate");
+        query.append("SELECT * from ofMessageArchive");
+        query.append(" where fromJID = '");
+        query.append(username);
+        query.append("' or toJID = '");
+        query.append(username);
+        query.append("' ORDER BY  ofMessageArchive.sentDate");
         query.append(" DESC");
         query.append(" LIMIT ").append(startIndex).append(",").append(numResults);
         
-        System.out.println("sql is : " + query.toString());
+        System.out.println("sql output is : " + query.toString());
         
         
         try {
@@ -78,7 +90,7 @@ public class ChatLogsServlet extends HttpServlet {
             	        break;
             	    }
             	  }
-            	  json.add(obj);
+            	  json.put(obj);
             }
             
             rs.close();
@@ -92,6 +104,11 @@ public class ChatLogsServlet extends HttpServlet {
 			System.out.println("sql + whatsup -" + e.getMessage());
 			// e.printStackTrace();
 			replyError(e.toString(), response, out);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			System.out.println("json + whatsup -" + e.getMessage());
+			replyError(e.toString(), response, out);
+			// e.printStackTrace();
 		} finally {
             DbConnectionManager.closeConnection(result, con);
         }
