@@ -50,6 +50,29 @@ public class ChatLogsServlet extends HttpServlet {
         
         System.out.println("username is: " + username);
         
+        StringBuilder query_count = new StringBuilder();
+        query_count.append("SELECT count(*) as sum from ofMessageArchive");
+        
+        System.out.println("sql query_count output is : " + query_count.toString());
+        
+        // Get total count
+        try {
+			con = DbConnectionManager.getConnection();
+			PreparedStatement result_count = DbConnectionManager.createScrollablePreparedStatement(con, query_count.toString());
+			ResultSet rs_count = result_count.executeQuery();
+			rs_count.next();
+			
+			System.out.println("total count: " + rs_count.getString("sum"));
+			int total_count = Integer.parseInt(rs_count.getString("sum"));
+        } catch (SQLException e) {
+			// TODO Auto-generated catch block
+			System.out.println("sql + whatsup -" + e.getMessage());
+			// e.printStackTrace();
+			replyError(e.toString(), response, out);
+        	
+        }
+        
+        
         
         StringBuilder query = new StringBuilder();
         query.append("SELECT * from ofMessageArchive");
