@@ -42,16 +42,27 @@ public class ChatLogsServlet extends HttpServlet {
         JSONObject obj = null;
         JSONArray json = new JSONArray();
         
-        String username = request.getParameter("username");
+        String user1 = request.getParameter("user1");
+        String user2 = request.getParameter("user2");
+        int total_count = 0;
         int pageSize = 5;
-        int page = Integer.parseInt(request.getParameter("page"));
-        int startIndex = (page - 1) * pageSize;
-        int numResults = pageSize;
+        // int page = Integer.parseInt(request.getParameter("page"));
         
-        System.out.println("username is: " + username);
+        
+        System.out.println("user1 is: " + user1);
+        System.out.println("user2 is: " + user2);
         
         StringBuilder query_count = new StringBuilder();
         query_count.append("SELECT count(*) as sum from ofMessageArchive");
+        query_count.append(" where (fromJID = '");
+        query_count.append(user1);
+        query_count.append("' and toJID = '");
+        query_count.append(user2);
+        query_count.append("') or (fromJID = '");
+        query_count.append(user2);
+        query_count.append("' and toJID = '");
+        query_count.append(user1);
+        query_count.append("') ");
         
         System.out.println("sql query_count output is : " + query_count.toString());
         
@@ -63,7 +74,7 @@ public class ChatLogsServlet extends HttpServlet {
 			rs_count.next();
 			
 			System.out.println("total count: " + rs_count.getString("sum"));
-			int total_count = Integer.parseInt(rs_count.getString("sum"));
+			total_count = Integer.parseInt(rs_count.getString("sum"));
         } catch (SQLException e) {
 			// TODO Auto-generated catch block
 			System.out.println("sql + whatsup -" + e.getMessage());
@@ -73,15 +84,23 @@ public class ChatLogsServlet extends HttpServlet {
         }
         
         
+        int startIndex = total_count - pageSize;
+        int numResults = pageSize;
+        
+        
         
         StringBuilder query = new StringBuilder();
         query.append("SELECT * from ofMessageArchive");
-        query.append(" where fromJID = '");
-        query.append(username);
-        query.append("' or toJID = '");
-        query.append(username);
-        query.append("' ORDER BY  ofMessageArchive.sentDate");
-        query.append(" DESC");
+        query.append(" where (fromJID = '");
+        query.append(user1);
+        query.append("' and toJID = '");
+        query.append(user2);
+        query.append("') or (fromJID = '");
+        query.append(user2);
+        query.append("' and toJID = '");
+        query.append(user1);
+        query.append("') ORDER BY  ofMessageArchive.sentDate");
+        query.append(" ASC");
         query.append(" LIMIT ").append(startIndex).append(",").append(numResults);
         
         System.out.println("sql output is : " + query.toString());
