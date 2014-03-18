@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;  
 import javax.servlet.http.HttpServletResponse;  
 
+import org.jivesoftware.admin.AuthCheckFilter;
 import org.jivesoftware.database.DbConnectionManager;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,7 +27,8 @@ public class ChatLogsServlet extends HttpServlet {
 
 	@Override  
     public void init() throws ServletException {  
-        super.init();  
+        super.init();
+        AuthCheckFilter.addExclude("chatlogs");
     }  
   
     @Override  
@@ -137,5 +139,6 @@ public class ChatLogsServlet extends HttpServlet {
     @Override  
     public void destroy() {  
         super.destroy();  
+        AuthCheckFilter.removeExclude("chatlogs");
     }  
 }  
