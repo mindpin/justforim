@@ -83,8 +83,9 @@ public class ChatLogsServlet extends HttpServlet {
         	
         }
         
+        int startIndex = ((total_count - pageSize) < 0)? 0:(total_count - pageSize);
+        System.out.println("start index: " + startIndex);
         
-        int startIndex = total_count - pageSize;
         int numResults = pageSize;
         
         
