@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<plugin>
+    <class>org.jivesoftware.openfire.plugin.ContactListPlugin</class>
+    <name>Contact List</name>
+    <description>Allows users to add contact list</description>
+    <author>Arly Xiao</author>
+    <version>1.0.0</version>
+    <date>03/23/2014</date>
+    <minServerVersion>3.9.0</minServerVersion>
+    
+    <adminconsole>      
+        <tab id="tab-server">
+            <sidebar id="sidebar-server-settings">
+                <item id="contact-list" name="Contact List" url="contact-list.jsp"
+                     description="Contact List" />
+            </sidebar>
+        </tab>
+    </adminconsole>
+
+</plugin>
