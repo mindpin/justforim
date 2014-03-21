@@ -77,7 +77,7 @@ public class ContactListPlugin implements Plugin {
             }
             RosterItem ri = r.createRosterItem(j, itemName, groups, false, true);
             if (subscription == null) {
-                subscription = "0";
+                subscription = "3";
             }
             ri.setSubStatus(RosterItem.SubType.getTypeFromInt(Integer.parseInt(subscription)));
             r.updateRosterItem(ri);

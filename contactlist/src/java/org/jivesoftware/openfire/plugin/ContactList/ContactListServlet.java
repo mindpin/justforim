@@ -52,12 +52,13 @@ public class ContactListServlet extends HttpServlet {
         String item_jid = request.getParameter("item_jid");
         String item_name = item_jid.split("@")[0];
         String subscription = "3";
-        String groupNames = "Everyone";
+        // String groupNames = "Everyone";
+        String group_names = null;
         
         if (type.equals("add")) {
         
 	        try {
-				plugin.addRosterItem(username, item_jid, item_name, subscription, groupNames);
+				plugin.addRosterItem(username, item_jid, item_name, subscription, group_names);
 				
 				replyMessage("ok", response, out);
 			} catch (UserNotFoundException e) {
@@ -66,7 +67,7 @@ public class ContactListServlet extends HttpServlet {
 			} catch (UserAlreadyExistsException e) {
 				// TODO Auto-generated catch block
 				try {
-					plugin.updateRosterItem(username, item_jid, item_name, subscription, groupNames);
+					plugin.updateRosterItem(username, item_jid, item_name, subscription, group_names);
 				} catch (UserNotFoundException e1) {
 					replyError(e.toString(),response, out);
 				} catch (SharedGroupException e1) {
