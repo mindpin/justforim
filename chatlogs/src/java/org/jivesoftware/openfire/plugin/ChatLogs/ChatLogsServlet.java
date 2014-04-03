@@ -35,6 +35,10 @@ public class ChatLogsServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request,  
             HttpServletResponse response) throws ServletException, IOException {  
         // super.doGet(request, response);
+//    	PrintWriter out = response.getWriter();
+//    	response.setContentType("text/plain; charset=utf-8");        
+//        out.println("abc");
+//        out.flush();
     	  
         PrintWriter out = response.getWriter();
         Connection con = null;
@@ -87,7 +91,7 @@ public class ChatLogsServlet extends HttpServlet {
         System.out.println("start index: " + startIndex);
         
         int numResults = pageSize;
-        
+                
         
         
         StringBuilder query = new StringBuilder();
