@@ -17,6 +17,7 @@ import org.jivesoftware.openfire.XMPPServer;
 import org.jivesoftware.openfire.plugin.ContactListPlugin;
 import org.jivesoftware.openfire.user.UserAlreadyExistsException;
 import org.jivesoftware.openfire.user.UserNotFoundException;
+import org.xmpp.packet.JID;
 
 
 
@@ -29,6 +30,7 @@ public class ContactListServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
 	private ContactListPlugin plugin;
+	private String domain;
 
 	@Override  
     public void init() throws ServletException {  
@@ -36,6 +38,10 @@ public class ContactListServlet extends HttpServlet {
         AuthCheckFilter.addExclude("contactlist");
         
         plugin = (ContactListPlugin) XMPPServer.getInstance().getPluginManager().getPlugin("contactlist");
+        domain = XMPPServer.getInstance().getServerInfo().getXMPPDomain();
+        
+        System.out.println("hostname: " + XMPPServer.getInstance().getServerInfo().getHostname());
+        System.out.println("contactlist domain: " + domain);
        
     }  
   
@@ -49,8 +55,18 @@ public class ContactListServlet extends HttpServlet {
         String type = request.getParameter("type");
         
         String username = request.getParameter("user");
+        username = JID.escapeNode(username);
+        
         String item_jid = request.getParameter("item_jid");
-        String item_name = item_jid.split("@")[0];
+        item_jid = item_jid.split("@" + domain)[0];
+        item_jid = JID.escapeNode(item_jid);
+        item_jid = item_jid + "@" + domain;
+        
+        System.out.println("new username: " + username);
+        System.out.println("new item_jid: " + item_jid);
+        
+        
+        String item_name = item_jid.split("@" + domain)[0];
         String subscription = "3";
         // String groupNames = "Everyone";
         String group_names = null;

@@ -15,20 +15,26 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.jivesoftware.admin.AuthCheckFilter;
 import org.jivesoftware.database.DbConnectionManager;
+import org.jivesoftware.openfire.XMPPServer;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.xmpp.packet.JID;
 
   
 public class ChatLogsServlet extends HttpServlet {  
   
 
 	private static final long serialVersionUID = 1L;
+	private String domain;
 
 	@Override  
     public void init() throws ServletException {  
         super.init();
         AuthCheckFilter.addExclude("chatlogs");
+        
+        domain = XMPPServer.getInstance().getServerInfo().getXMPPDomain();
+        System.out.println("chatlogs domain: " + domain);
     }  
   
     @Override  
@@ -47,7 +53,17 @@ public class ChatLogsServlet extends HttpServlet {
         JSONArray json = new JSONArray();
         
         String user1 = request.getParameter("user1");
+        user1 = user1.split("@" + domain)[0];
+        user1 = JID.escapeNode(user1);
+        user1 = user1 + "@" + domain;
+        user1 = user1.replace("\\", "\\\\");
+        
         String user2 = request.getParameter("user2");
+        user2 = user2.split("@" + domain)[0];
+        user2 = JID.escapeNode(user2);
+        user2 = user2 + "@" + domain;
+        user2 = user2.replace("\\", "\\\\");
+        
         int total_count = 0;
         int pageSize = 5;
         // int page = Integer.parseInt(request.getParameter("page"));
