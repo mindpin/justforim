@@ -53,20 +53,34 @@ public class ContactListServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         
         String type = request.getParameter("type");
+        String domain_part = "@" + domain;
         
         String username = request.getParameter("user");
         username = JID.escapeNode(username);
         
         String item_jid = request.getParameter("item_jid");
-        item_jid = item_jid.split("@" + domain)[0];
-        item_jid = JID.escapeNode(item_jid);
-        item_jid = item_jid + "@" + domain;
+        System.out.println("lastIndexOf is: " + item_jid.lastIndexOf(domain_part));
+        
+        String item_name = item_jid.substring(0, item_jid.lastIndexOf(domain_part));
+        
+        System.out.println("item_name is: " + item_name);
+        
+//        System.out.println("param item_jid is: " + item_jid);
+//        String[] item_jid_parts = item_jid.split("@" + domain);
+//        System.out.println("param item_jid length is: " + item_jid_parts.length);
+//        if (item_jid_parts.length == 2) {
+//        	item_jid = item_jid_parts[0] + "@" + domain + item_jid_parts[1];
+//        } else {
+//        	item_jid = item_jid_parts[0];
+//        }
+        
+        item_name = JID.escapeNode(item_name);
+        item_jid = item_name + domain_part;
         
         System.out.println("new username: " + username);
         System.out.println("new item_jid: " + item_jid);
         
         
-        String item_name = item_jid.split("@" + domain)[0];
         String subscription = "3";
         // String groupNames = "Everyone";
         String group_names = null;
