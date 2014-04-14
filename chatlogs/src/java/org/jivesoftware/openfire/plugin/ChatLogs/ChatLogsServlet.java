@@ -51,17 +51,20 @@ public class ChatLogsServlet extends HttpServlet {
         PreparedStatement result = null;
         JSONObject obj = null;
         JSONArray json = new JSONArray();
+        String domain_part = "@" + domain;
         
         String user1 = request.getParameter("user1");
-        user1 = user1.split("@" + domain)[0];
+        user1 = user1.substring(0, user1.lastIndexOf(domain_part));
+        
         user1 = JID.escapeNode(user1);
-        user1 = user1 + "@" + domain;
+        user1 = user1 + domain_part;
         user1 = user1.replace("\\", "\\\\");
         
         String user2 = request.getParameter("user2");
-        user2 = user2.split("@" + domain)[0];
+        user2 = user2.substring(0, user2.lastIndexOf(domain_part));
+        
         user2 = JID.escapeNode(user2);
-        user2 = user2 + "@" + domain;
+        user2 = user2 + domain_part;
         user2 = user2.replace("\\", "\\\\");
         
         int total_count = 0;
